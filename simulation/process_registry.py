@@ -1,19 +1,50 @@
 class ProcessRegistry:
 
     def __init__(self):
-        self.processes = []
+        self.processes = {}
+        self.dependencies = {}
 
-    def register(self, process):
-        self.processes.append(process)
+    def register(self, process, depends_on=None):
 
-    def run_all(self, world):
-        results = []
+        self.processes[process.process_name] = process
+
+        self.dependencies[process.process_name] = (
+            depends_on or []
+        )
+
+    def execution_order(self):
+
+        ordered = []
+        visited = set()
+
+        def visit(name):
+
+            if name in visited:
+                return
+
+            visited.add(name)
+
+            for dependency in self.dependencies[name]:
+                visit(dependency)
+
+            ordered.append(name)
 
         for process in self.processes:
-            result = process.apply(world)
+            visit(process)
+
+        return ordered
+
+    def run_all(self, world):
+
+        results = []
+
+        for process_name in self.execution_order():
+
+            process = self.processes[process_name]
+
             results.append({
-                "process": process.process_name,
-                "result": result
+                "process": process_name,
+                "result": process.apply(world)
             })
 
         return results
