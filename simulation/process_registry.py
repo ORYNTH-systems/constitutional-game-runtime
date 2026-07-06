@@ -5,12 +5,8 @@ class ProcessRegistry:
         self.dependencies = {}
 
     def register(self, process, depends_on=None):
-
         self.processes[process.process_name] = process
-
-        self.dependencies[process.process_name] = (
-            depends_on or []
-        )
+        self.dependencies[process.process_name] = depends_on or []
 
     def execution_order(self):
 
@@ -42,8 +38,21 @@ class ProcessRegistry:
 
             process = self.processes[process_name]
 
+            admissible = process.admissible(world)
+
+            if not admissible:
+
+                results.append({
+                    "process": process_name,
+                    "executed": False,
+                    "reason": "NOT_ADMISSIBLE"
+                })
+
+                continue
+
             results.append({
                 "process": process_name,
+                "executed": True,
                 "result": process.apply(world)
             })
 
