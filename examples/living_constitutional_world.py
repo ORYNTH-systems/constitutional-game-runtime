@@ -11,12 +11,11 @@ from simulation.constitutional_world import ConstitutionalWorld
 def main():
     world = ConstitutionalWorld()
 
-    print("INITIAL WORLD")
-    print(world)
+    for _ in range(1000):
+        world.tick()
 
-    print("\nAFTER ONE CONSTITUTIONAL TICK")
-    world.tick()
     print(world)
+    print(f"\nHistory Length: {len(world.history)}")
 
 
 if __name__ == "__main__":
