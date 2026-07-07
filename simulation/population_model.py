@@ -10,7 +10,6 @@ class PopulationModel:
 
     def increase_hunger_pressure(self, amount):
         self.hunger_pressure += amount
-
         return {
             "population_metric": "hunger_pressure",
             "change": amount,
@@ -22,7 +21,6 @@ class PopulationModel:
             0,
             self.hunger_pressure - amount,
         )
-
         return {
             "population_metric": "hunger_pressure",
             "change": -amount,
@@ -30,11 +28,6 @@ class PopulationModel:
         }
 
     def update_health(self):
-        """
-        Population health is reduced by accumulated
-        constitutional hunger pressure.
-        """
-
         previous = self.health
 
         if self.hunger_pressure > 0:
@@ -52,6 +45,17 @@ class PopulationModel:
             "population_metric": "health",
             "previous": previous,
             "new_value": self.health,
+        }
+
+    def grow(self, amount):
+        previous = self.total
+        self.total += amount
+
+        return {
+            "population_metric": "population",
+            "previous": previous,
+            "change": amount,
+            "new_value": self.total,
         }
 
     def __str__(self):

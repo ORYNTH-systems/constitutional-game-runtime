@@ -106,3 +106,33 @@ class PopulationHealthProcess(ConstitutionalProcess):
             "status": "EXECUTED",
             "changes": [change],
         }
+
+
+class PopulationGrowthProcess(ConstitutionalProcess):
+    process_id = "CP-005"
+    name = "Population Growth"
+
+    def evaluate(self, world):
+        admissible = (
+            world.population.health >= 95
+            and world.population.hunger_pressure == 0
+            and world.resources.food >= world.population.total
+        )
+
+        return {
+            "admissible": admissible,
+            "reason": "ADMISSIBLE" if admissible else "GROWTH_DENIED",
+            "health": world.population.health,
+            "hunger_pressure": world.population.hunger_pressure,
+            "food": world.resources.food,
+            "population": world.population.total,
+        }
+
+    def execute(self, world):
+        change = world.population.grow(1)
+        return {
+            "process_id": self.process_id,
+            "name": self.name,
+            "status": "EXECUTED",
+            "changes": [change],
+        }

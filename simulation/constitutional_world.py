@@ -9,6 +9,7 @@ from simulation.constitutional_processes import (
     FoodConsumptionProcess,
     PopulationHungerPressureProcess,
     PopulationHealthProcess,
+    PopulationGrowthProcess,
 )
 
 
@@ -24,6 +25,7 @@ class ConstitutionalWorld:
         self.process_registry.register(FoodConsumptionProcess())
         self.process_registry.register(PopulationHungerPressureProcess())
         self.process_registry.register(PopulationHealthProcess())
+        self.process_registry.register(PopulationGrowthProcess())
 
         self.process_engine = ConstitutionalProcessEngine(self.process_registry)
 
@@ -67,7 +69,6 @@ class ConstitutionalWorld:
             revision=self.revision.revision + 1,
             evidence=evidence,
         )
-
         return self.revision
 
     def describe_process_registry(self):
