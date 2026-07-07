@@ -6,6 +6,7 @@ from simulation.constitutional_process_engine import ConstitutionalProcessEngine
 from simulation.constitutional_processes import (
     FoodGrowthProcess,
     FoodConsumptionProcess,
+    PopulationHungerPressureProcess,
 )
 
 
@@ -23,6 +24,7 @@ class ConstitutionalWorld:
 
         self.process_engine.register(FoodGrowthProcess())
         self.process_engine.register(FoodConsumptionProcess())
+        self.process_engine.register(PopulationHungerPressureProcess())
 
         self.revision = self._create_revision(
             revision=0,

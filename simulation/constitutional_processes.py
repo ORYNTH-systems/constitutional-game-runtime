@@ -19,8 +19,6 @@ class ConstitutionalProcess:
 class FoodGrowthProcess(ConstitutionalProcess):
     """
     CP-001: Food Growth
-
-    Deterministically increases available food each tick.
     """
 
     process_id = "CP-001"
@@ -28,7 +26,6 @@ class FoodGrowthProcess(ConstitutionalProcess):
 
     def execute(self, world):
         change = world.resources.grow_food(4)
-
         return {
             "process_id": self.process_id,
             "name": self.name,
@@ -40,15 +37,13 @@ class FoodGrowthProcess(ConstitutionalProcess):
 class FoodConsumptionProcess(ConstitutionalProcess):
     """
     CP-002: Food Consumption
-
-    Deterministically consumes food based on population.
     """
 
     process_id = "CP-002"
     name = "Food Consumption"
 
     def evaluate(self, world):
-        required_food = world.population.total * 1
+        required_food = world.population.total
 
         if world.resources.food < required_food:
             return {
@@ -66,8 +61,38 @@ class FoodConsumptionProcess(ConstitutionalProcess):
         }
 
     def execute(self, world):
-        required_food = world.population.total * 1
+        required_food = world.population.total
         change = world.resources.consume_food(required_food)
+        return {
+            "process_id": self.process_id,
+            "name": self.name,
+            "status": "EXECUTED",
+            "changes": [change],
+        }
+
+
+class PopulationHungerPressureProcess(ConstitutionalProcess):
+    """
+    CP-003: Population Hunger Pressure
+    """
+
+    process_id = "CP-003"
+    name = "Population Hunger Pressure"
+
+    def evaluate(self, world):
+        return {
+            "admissible": True,
+            "reason": "ADMISSIBLE",
+            "food": world.resources.food,
+            "population": world.population.total,
+            "current_hunger_pressure": world.population.hunger_pressure,
+        }
+
+    def execute(self, world):
+        if world.resources.food <= 0:
+            change = world.population.increase_hunger_pressure(1)
+        else:
+            change = world.population.reduce_hunger_pressure(1)
 
         return {
             "process_id": self.process_id,
