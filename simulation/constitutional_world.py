@@ -8,14 +8,11 @@ from simulation.constitutional_processes import (
     FoodGrowthProcess,
     FoodConsumptionProcess,
     PopulationHungerPressureProcess,
+    PopulationHealthProcess,
 )
 
 
 class ConstitutionalWorld:
-    """
-    Root object representing a governed constitutional world.
-    """
-
     def __init__(self):
         self.clock = SimulationClock()
         self.resources = ResourceModel()
@@ -26,10 +23,9 @@ class ConstitutionalWorld:
         self.process_registry.register(FoodGrowthProcess())
         self.process_registry.register(FoodConsumptionProcess())
         self.process_registry.register(PopulationHungerPressureProcess())
+        self.process_registry.register(PopulationHealthProcess())
 
-        self.process_engine = ConstitutionalProcessEngine(
-            self.process_registry
-        )
+        self.process_engine = ConstitutionalProcessEngine(self.process_registry)
 
         self.revision = self._create_revision(
             revision=0,
@@ -53,7 +49,6 @@ class ConstitutionalWorld:
 
     def tick(self):
         self.clock.advance()
-
         process_results = self.process_engine.execute_all(self)
 
         evidence = {

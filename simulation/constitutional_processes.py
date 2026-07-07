@@ -1,8 +1,4 @@
 class ConstitutionalProcess:
-    """
-    Base class for deterministic constitutional processes.
-    """
-
     process_id = "CP-000"
     name = "Base Constitutional Process"
 
@@ -17,10 +13,6 @@ class ConstitutionalProcess:
 
 
 class FoodGrowthProcess(ConstitutionalProcess):
-    """
-    CP-001: Food Growth
-    """
-
     process_id = "CP-001"
     name = "Food Growth"
 
@@ -35,10 +27,6 @@ class FoodGrowthProcess(ConstitutionalProcess):
 
 
 class FoodConsumptionProcess(ConstitutionalProcess):
-    """
-    CP-002: Food Consumption
-    """
-
     process_id = "CP-002"
     name = "Food Consumption"
 
@@ -72,10 +60,6 @@ class FoodConsumptionProcess(ConstitutionalProcess):
 
 
 class PopulationHungerPressureProcess(ConstitutionalProcess):
-    """
-    CP-003: Population Hunger Pressure
-    """
-
     process_id = "CP-003"
     name = "Population Hunger Pressure"
 
@@ -94,6 +78,28 @@ class PopulationHungerPressureProcess(ConstitutionalProcess):
         else:
             change = world.population.reduce_hunger_pressure(1)
 
+        return {
+            "process_id": self.process_id,
+            "name": self.name,
+            "status": "EXECUTED",
+            "changes": [change],
+        }
+
+
+class PopulationHealthProcess(ConstitutionalProcess):
+    process_id = "CP-004"
+    name = "Population Health"
+
+    def evaluate(self, world):
+        return {
+            "admissible": True,
+            "reason": "ADMISSIBLE",
+            "health": world.population.health,
+            "hunger_pressure": world.population.hunger_pressure,
+        }
+
+    def execute(self, world):
+        change = world.population.update_health()
         return {
             "process_id": self.process_id,
             "name": self.name,
