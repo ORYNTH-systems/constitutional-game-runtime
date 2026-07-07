@@ -17,6 +17,14 @@ class ResourceModel:
             "new_value": self.food,
         }
 
+    def consume_food(self, amount):
+        self.food -= amount
+        return {
+            "resource": "food",
+            "change": -amount,
+            "new_value": self.food,
+        }
+
     def __str__(self):
         return (
             f"Food: {self.food}\n"

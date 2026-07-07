@@ -3,6 +3,10 @@ from simulation.world_revision import WorldRevision
 from simulation.resource_model import ResourceModel
 from simulation.population_model import PopulationModel
 from simulation.constitutional_process_engine import ConstitutionalProcessEngine
+from simulation.constitutional_processes import (
+    FoodGrowthProcess,
+    FoodConsumptionProcess,
+)
 
 
 class ConstitutionalWorld:
@@ -16,6 +20,9 @@ class ConstitutionalWorld:
         self.population = PopulationModel()
         self.process_engine = ConstitutionalProcessEngine()
         self.history = []
+
+        self.process_engine.register(FoodGrowthProcess())
+        self.process_engine.register(FoodConsumptionProcess())
 
         self.revision = self._create_revision(
             revision=0,
@@ -39,17 +46,17 @@ class ConstitutionalWorld:
     def tick(self):
         self.clock.advance()
 
-        food_growth = self.resources.grow_food(4)
+        process_results = self.process_engine.execute_all(self)
 
         evidence = {
             "event": "simulation_tick",
             "tick": self.clock.tick,
-            "processes_executed": ["food_growth"],
+            "processes_executed": process_results["executed"],
+            "processes_denied": process_results["denied"],
             "governance": {
-                "approved": 1,
-                "denied": 0,
+                "approved": len(process_results["executed"]),
+                "denied": len(process_results["denied"]),
             },
-            "resource_changes": [food_growth],
         }
 
         self.revision = self._create_revision(
