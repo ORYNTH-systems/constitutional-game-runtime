@@ -1,19 +1,19 @@
 class ConstitutionalProcessEngine:
     """
-    Registry and executor of constitutional processes.
+    Executor for registered Constitutional Processes.
+
+    The process registry owns the catalog.
+    The process engine executes the registered processes.
     """
 
-    def __init__(self):
-        self.processes = []
-
-    def register(self, process):
-        self.processes.append(process)
+    def __init__(self, registry):
+        self.registry = registry
 
     def execute_all(self, world):
         executed = []
         denied = []
 
-        for process in self.processes:
+        for process in self.registry.all():
             evaluation = process.evaluate(world)
 
             if evaluation["admissible"]:
@@ -21,12 +21,14 @@ class ConstitutionalProcessEngine:
                 result["governance"] = evaluation
                 executed.append(result)
             else:
-                denied.append({
-                    "process_id": process.process_id,
-                    "name": process.name,
-                    "status": "DENIED",
-                    "governance": evaluation,
-                })
+                denied.append(
+                    {
+                        "process_id": process.process_id,
+                        "name": process.name,
+                        "status": "DENIED",
+                        "governance": evaluation,
+                    }
+                )
 
         return {
             "executed": executed,
@@ -34,4 +36,4 @@ class ConstitutionalProcessEngine:
         }
 
     def __str__(self):
-        return f"Registered Processes: {len(self.processes)}"
+        return f"Registered Processes: {self.registry.count()}"

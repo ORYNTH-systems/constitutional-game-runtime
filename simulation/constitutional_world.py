@@ -2,6 +2,7 @@ from simulation.simulation_clock import SimulationClock
 from simulation.world_revision import WorldRevision
 from simulation.resource_model import ResourceModel
 from simulation.population_model import PopulationModel
+from simulation.constitutional_process_registry import ConstitutionalProcessRegistry
 from simulation.constitutional_process_engine import ConstitutionalProcessEngine
 from simulation.constitutional_processes import (
     FoodGrowthProcess,
@@ -19,18 +20,23 @@ class ConstitutionalWorld:
         self.clock = SimulationClock()
         self.resources = ResourceModel()
         self.population = PopulationModel()
-        self.process_engine = ConstitutionalProcessEngine()
         self.history = []
 
-        self.process_engine.register(FoodGrowthProcess())
-        self.process_engine.register(FoodConsumptionProcess())
-        self.process_engine.register(PopulationHungerPressureProcess())
+        self.process_registry = ConstitutionalProcessRegistry()
+        self.process_registry.register(FoodGrowthProcess())
+        self.process_registry.register(FoodConsumptionProcess())
+        self.process_registry.register(PopulationHungerPressureProcess())
+
+        self.process_engine = ConstitutionalProcessEngine(
+            self.process_registry
+        )
 
         self.revision = self._create_revision(
             revision=0,
             evidence={
                 "event": "world_initialized",
                 "governance": "active",
+                "registered_processes": self.process_registry.identifiers(),
             },
         )
 
@@ -59,6 +65,7 @@ class ConstitutionalWorld:
                 "approved": len(process_results["executed"]),
                 "denied": len(process_results["denied"]),
             },
+            "registered_processes": self.process_registry.identifiers(),
         }
 
         self.revision = self._create_revision(
@@ -67,6 +74,9 @@ class ConstitutionalWorld:
         )
 
         return self.revision
+
+    def describe_process_registry(self):
+        return self.process_registry.describe()
 
     def __str__(self):
         return (
