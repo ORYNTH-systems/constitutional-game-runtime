@@ -1,176 +1,171 @@
-\# Constitutional Game Runtime
+# Constitutional Game Runtime
 
+The reference implementation of the Constitutional Runtime Specification (CRS).
 
+The Constitutional Game Runtime introduces a constitutional execution model in which every requested action, process, or event is evaluated against the current state of the world immediately before execution. Rather than assuming execution after a request is made, the runtime continuously reconstructs execution eligibility as the simulated world evolves.
 
-A reference runtime for constitutionally governed game worlds, simulations, and adaptive agent systems.
+---
 
+## Constitutional Runtime Specification (CRS)
 
+Version: **0.1**
 
-Unlike traditional game engines that execute scripted behavior once requested, the Constitutional Game Runtime continuously evaluates whether actions remain admissible under the current state of the world before they execute.
+Reference Generation: **RG21**
 
+The Constitutional Runtime Specification defines the normative architecture of the runtime independently of its implementation.
 
+| Part | Specification |
+|------|---------------|
+| 00 | Overview |
+| 01 | Architecture |
+| 02 | Execution Model |
+| 03 | World Model |
+| 04 | Governance Model |
+| 05 | Simulation Model |
+| 06 | Validation Model |
+| 07 | Comparison |
+| 08 | Reference Domains |
+| 09 | Roadmap |
 
-\## Core Question
+The implementation contained in this repository demonstrates the architectural principles defined by the CRS.
 
+---
 
+## Architectural Thesis
 
-Can a game world determine whether an action, process, or event is still admissible at the exact moment of execution after the world has changed?
+Conventional game engines primarily determine **how** objects behave.
 
+The Constitutional Game Runtime determines **whether** behavior remains constitutionally admissible under the current state of the world immediately before execution.
 
+This shifts simulation from scripted execution toward governed execution.
 
-\## Constitutional Runtime Model
+---
 
+## Constitutional Runtime
 
+Every constitutional runtime is composed of five governing primitives.
 
+```text
+World
+    │
+    ▼
+Governance
+    │
+    ▼
+Execution
+    │
+    ▼
+Simulation
+    │
+    ▼
+Evidence
 ```
 
+All runtime behavior emerges from these constitutional primitives.
+
+---
+
+## Constitutional Execution
+
+```text
 Intent
-
-&#x20;   ↓
-
-Current World State
-
-&#x20;   ↓
-
-State Reconstruction
-
-&#x20;   ↓
-
+    │
+    ▼
+Current World Reconstruction
+    │
+    ▼
 Constraint Evaluation
-
-&#x20;   ↓
-
+    │
+    ▼
 Governance Decision
-
-&#x20;   ↓
-
+    │
+    ▼
 Execution Eligibility
-
-&#x20;   ↓
-
-Execute or Deny
-
-&#x20;   ↓
-
+    │
+ ┌──┴──┐
+ │     │
+Execute Deny
+ │     │
+ └──┬──┘
+    ▼
 Replay Evidence
-
 ```
 
+Execution is therefore a consequence of governance rather than a consequence of intent.
 
+---
 
-Every execution decision is evaluated against the live constitutional state of the simulation rather than relying solely on prior authorization or scripted logic.
+## Repository
 
+```text
+documentation/
+    Constitutional Runtime Specification
 
+engine/
+    Runtime primitives
 
-\## Core Capabilities
+governance/
+    Constitutional governance
 
+simulation/
+    Continuous world evolution
 
+validation/
+    Deterministic validation
 
-\* Constitutional execution governance
-
-\* Continuous world-state reconstruction
-
-\* Constraint graph evaluation
-
-\* Simulation process scheduling
-
-\* World evolution
-
-\* Replayable execution evidence
-
-\* Deterministic validation
-
-
-
-\## Reference Domains
-
-
-
-\* Open-world simulation
-
-\* Survival systems
-
-\* Role-playing games (RPGs)
-
-\* Real-time strategy (RTS)
-
-\* MMO-style synchronization
-
-\* Sports simulation
-
-\* Persistent civilizations
-
-\* Autonomous agent systems
-
-\* \*\*Uprising: The Cephalopod Era\*\*
-
-
-
-\## Repository Structure
-
-
-
+examples/
+    Reference demonstrations
 ```
 
-engine/          Runtime primitives
+---
 
-governance/      Constitutional decision engine
+## Validation
 
-simulation/      Continuous world evolution
+Reference Runtime Version **0.1**
 
-validation/      Reference validation suite
+Current benchmark coverage includes:
 
-examples/        Demonstration scenarios
+- Constitutional execution
+- Constitutional denial
+- Constraint evaluation
+- Event scheduling
+- Process admissibility
+- Process dependency ordering
+- Simulation process registry
+- World evolution
 
-documentation/   Architectural specifications
+**Current Result**
 
-```
+**8 / 8 constitutional validations passing**
 
+---
 
+## Representative Domains
 
-\## Validation Status
+The constitutional runtime architecture is domain-independent.
 
+Representative applications include:
 
+- Open-world games
+- Strategy simulation
+- Persistent civilizations
+- Sports simulation
+- Autonomous agents
+- Educational simulation
+- Economic simulation
+- Scientific simulation
+- **Uprising: The Cephalopod Era**
 
-Runtime Version: \*\*0.1\*\*
+---
 
+## Publication
 
+**Constitutional Runtime Specification**
 
-Current benchmark status:
+Version **0.1**
 
+Reference Generation **RG21**
 
+This repository contains the first complete Constitutional Runtime Specification together with its executable reference implementation and deterministic validation suite.
 
-\* ✅ Constitutional execution
-
-\* ✅ Constitutional denial
-
-\* ✅ Constraint graph evaluation
-
-\* ✅ Event scheduling
-
-\* ✅ Process admissibility
-
-\* ✅ Process dependency ordering
-
-\* ✅ Simulation process registry
-
-\* ✅ World evolution
-
-
-
-\*\*Result:\*\* \*\*8 / 8 validation suites passing.\*\*
-
-
-
-\## Status
-
-
-
-\*\*RG21 – Documentation Hardening\*\*
-
-
-
-The runtime demonstrates constitutional execution, governance, continuous simulation, and deterministic validation. Current work focuses on documenting the architecture and clearly communicating how constitutional simulation differs from traditional game-engine execution.
-
-
-
+Future reference generations extend runtime capability while preserving the constitutional execution model established by Version 0.1.
