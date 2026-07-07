@@ -9,6 +9,10 @@ class SimulationClock:
         self.season = "Spring"
         self.year = 1
 
+    def advance(self):
+        self.tick += 1
+        self.day += 1
+
     def __str__(self):
         return (
             f"Year: {self.year}\n"

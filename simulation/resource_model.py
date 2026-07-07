@@ -1,6 +1,6 @@
 class ResourceModel:
     """
-    Initial constitutional resource state.
+    Constitutional resource state.
     """
 
     def __init__(self):
@@ -8,6 +8,14 @@ class ResourceModel:
         self.water = float("inf")
         self.wood = 500
         self.stone = 200
+
+    def grow_food(self, amount):
+        self.food += amount
+        return {
+            "resource": "food",
+            "change": amount,
+            "new_value": self.food,
+        }
 
     def __str__(self):
         return (
