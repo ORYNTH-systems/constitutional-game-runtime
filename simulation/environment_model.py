@@ -18,6 +18,13 @@ class EnvironmentModel:
         "Winter",
     )
 
+    WATER_STATES = (
+        "Abundant",
+        "Normal",
+        "Limited",
+        "Scarce",
+    )
+
     def __init__(self):
         self.climate = "Temperate"
 
@@ -40,6 +47,7 @@ class EnvironmentModel:
         self.evidence = {
             "event": "environment_initialized",
             "climate": self.climate,
+            "water_availability": self.water_availability,
         }
 
     def update_climate(self):
@@ -80,6 +88,48 @@ class EnvironmentModel:
             "environment_metric": "season",
             "previous": previous,
             "new_value": self.season,
+        }
+
+    def update_water_cycle(self):
+        previous = self.water_availability
+
+        if self.weather == "Snow":
+            self.water_availability = "Normal"
+
+        elif self.rainfall >= 5:
+            self.water_availability = "Abundant"
+
+        elif self.rainfall >= 2:
+            self.water_availability = "Normal"
+
+        elif (
+            self.temperature > 38
+            and self.rainfall == 0
+        ):
+            self.water_availability = "Scarce"
+
+        elif (
+            self.temperature > 30
+            and self.rainfall == 0
+        ):
+            self.water_availability = "Limited"
+
+        self.environment_revision += 1
+
+        self.evidence = {
+            "event": "water_cycle_updated",
+            "previous": previous,
+            "current": self.water_availability,
+            "weather": self.weather,
+            "temperature": self.temperature,
+            "rainfall": self.rainfall,
+            "environment_revision": self.environment_revision,
+        }
+
+        return {
+            "environment_metric": "water_availability",
+            "previous": previous,
+            "new_value": self.water_availability,
         }
 
     def advance_day(self):
