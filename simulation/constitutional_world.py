@@ -3,6 +3,7 @@ from simulation.world_revision import WorldRevision
 from simulation.resource_model import ResourceModel
 from simulation.population_model import PopulationModel
 from simulation.environment_model import EnvironmentModel
+from simulation.settlement_model import SettlementModel
 from simulation.constitutional_process_registry import ConstitutionalProcessRegistry
 from simulation.constitutional_process_engine import ConstitutionalProcessEngine
 from simulation.constitutional_processes import (
@@ -20,6 +21,9 @@ from simulation.environmental_processes import (
     WaterCycleProcess,
     SoilFertilityProcess,
 )
+from simulation.settlement_processes import (
+    SettlementEvolutionProcess,
+)
 
 
 class ConstitutionalWorld:
@@ -28,6 +32,7 @@ class ConstitutionalWorld:
         self.resources = ResourceModel()
         self.population = PopulationModel()
         self.environment = EnvironmentModel()
+        self.settlement = SettlementModel()
         self.history = []
 
         self.process_registry = ConstitutionalProcessRegistry()
@@ -46,6 +51,9 @@ class ConstitutionalWorld:
         self.process_registry.register(WeatherProcess())
         self.process_registry.register(WaterCycleProcess())
         self.process_registry.register(SoilFertilityProcess())
+
+        # Settlement System
+        self.process_registry.register(SettlementEvolutionProcess())
 
         self.process_engine = ConstitutionalProcessEngine(
             self.process_registry
@@ -69,6 +77,7 @@ class ConstitutionalWorld:
             resources=self.resources,
             population=self.population,
             environment=self.environment,
+            settlement=self.settlement,
             evidence=evidence,
         )
 
