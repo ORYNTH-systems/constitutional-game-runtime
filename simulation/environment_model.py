@@ -48,6 +48,7 @@ class EnvironmentModel:
             "event": "environment_initialized",
             "climate": self.climate,
             "water_availability": self.water_availability,
+            "soil_fertility": self.soil_fertility,
         }
 
     def update_climate(self):
@@ -130,6 +131,46 @@ class EnvironmentModel:
             "environment_metric": "water_availability",
             "previous": previous,
             "new_value": self.water_availability,
+        }
+
+    def update_soil_fertility(self):
+        previous = self.soil_fertility
+
+        if self.water_availability == "Abundant":
+            self.soil_fertility = min(
+                100,
+                self.soil_fertility + 2,
+            )
+
+        elif self.water_availability == "Normal":
+            self.soil_fertility = self.soil_fertility
+
+        elif self.water_availability == "Limited":
+            self.soil_fertility = max(
+                0,
+                self.soil_fertility - 1,
+            )
+
+        elif self.water_availability == "Scarce":
+            self.soil_fertility = max(
+                0,
+                self.soil_fertility - 2,
+            )
+
+        self.environment_revision += 1
+
+        self.evidence = {
+            "event": "soil_fertility_updated",
+            "previous": previous,
+            "current": self.soil_fertility,
+            "water_availability": self.water_availability,
+            "environment_revision": self.environment_revision,
+        }
+
+        return {
+            "environment_metric": "soil_fertility",
+            "previous": previous,
+            "new_value": self.soil_fertility,
         }
 
     def advance_day(self):
