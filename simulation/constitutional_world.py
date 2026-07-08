@@ -18,6 +18,7 @@ from simulation.environmental_processes import (
     SeasonalTransitionProcess,
     WeatherProcess,
     WaterCycleProcess,
+    SoilFertilityProcess,
 )
 
 
@@ -44,6 +45,7 @@ class ConstitutionalWorld:
         self.process_registry.register(SeasonalTransitionProcess())
         self.process_registry.register(WeatherProcess())
         self.process_registry.register(WaterCycleProcess())
+        self.process_registry.register(SoilFertilityProcess())
 
         self.process_engine = ConstitutionalProcessEngine(
             self.process_registry
