@@ -45,3 +45,95 @@ class SeasonalTransitionProcess(EnvironmentalProcess):
             "status": "EXECUTED",
             "changes": [change],
         }
+
+
+class WeatherProcess(EnvironmentalProcess):
+    """
+    EP-002: Weather Reconstruction
+
+    Weather is reconstructed from the
+    current constitutional season.
+    """
+
+    process_id = "EP-002"
+    name = "Weather Reconstruction"
+
+    WEATHER_BY_SEASON = {
+        "Spring": {
+            "weather": "Rain",
+            "temperature": 18,
+            "rainfall": 6,
+            "wind": "Light",
+        },
+        "Summer": {
+            "weather": "Clear",
+            "temperature": 30,
+            "rainfall": 1,
+            "wind": "Calm",
+        },
+        "Autumn": {
+            "weather": "Cloudy",
+            "temperature": 15,
+            "rainfall": 3,
+            "wind": "Moderate",
+        },
+        "Winter": {
+            "weather": "Snow",
+            "temperature": -2,
+            "rainfall": 2,
+            "wind": "Strong",
+        },
+    }
+
+    def evaluate(self, world):
+        return {
+            "admissible": True,
+            "reason": "ADMISSIBLE",
+            "season": world.environment.season,
+            "current_weather": world.environment.weather,
+        }
+
+    def execute(self, world):
+        profile = self.WEATHER_BY_SEASON[
+            world.environment.season
+        ]
+
+        previous_weather = world.environment.weather
+
+        world.environment.weather = profile["weather"]
+        world.environment.temperature = profile["temperature"]
+        world.environment.rainfall = profile["rainfall"]
+        world.environment.wind = profile["wind"]
+
+        world.environment.environment_revision += 1
+
+        world.environment.evidence = {
+            "event": "weather_updated",
+            "season": world.environment.season,
+            "weather": world.environment.weather,
+        }
+
+        return {
+            "process_id": self.process_id,
+            "name": self.name,
+            "status": "EXECUTED",
+            "changes": [
+                {
+                    "environment_metric": "weather",
+                    "previous": previous_weather,
+                    "new_value": world.environment.weather,
+                },
+                {
+                    "environment_metric": "temperature",
+                    "new_value": world.environment.temperature,
+                },
+                {
+                    "environment_metric": "rainfall",
+                    "new_value": world.environment.rainfall,
+                },
+                {
+                    "environment_metric": "wind",
+                    "new_value": world.environment.wind,
+                },
+            ],
+        }

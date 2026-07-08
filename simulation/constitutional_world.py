@@ -13,7 +13,10 @@ from simulation.constitutional_processes import (
     PopulationGrowthProcess,
     PopulationMortalityProcess,
 )
-from simulation.environmental_processes import SeasonalTransitionProcess
+from simulation.environmental_processes import (
+    SeasonalTransitionProcess,
+    WeatherProcess,
+)
 
 
 class ConstitutionalWorld:
@@ -32,6 +35,7 @@ class ConstitutionalWorld:
         self.process_registry.register(PopulationGrowthProcess())
         self.process_registry.register(PopulationMortalityProcess())
         self.process_registry.register(SeasonalTransitionProcess())
+        self.process_registry.register(WeatherProcess())
 
         self.process_engine = ConstitutionalProcessEngine(self.process_registry)
 
