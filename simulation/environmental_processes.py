@@ -198,3 +198,42 @@ class WaterCycleProcess(EnvironmentalProcess):
             "status": "EXECUTED",
             "changes": [change],
         }
+
+
+class SoilFertilityProcess(EnvironmentalProcess):
+    process_id = "EP-005"
+    name = "Soil Fertility"
+
+    def evaluate(self, world):
+        admissible = (
+            world.environment.water_availability
+            in world.environment.WATER_STATES
+        )
+
+        return {
+            "admissible": admissible,
+            "reason": (
+                "ADMISSIBLE"
+                if admissible
+                else "INVALID_WATER_STATE"
+            ),
+            "climate": world.environment.climate,
+            "season": world.environment.season,
+            "weather": world.environment.weather,
+            "water_availability": (
+                world.environment.water_availability
+            ),
+            "soil_fertility": (
+                world.environment.soil_fertility
+            ),
+        }
+
+    def execute(self, world):
+        change = world.environment.update_soil_fertility()
+
+        return {
+            "process_id": self.process_id,
+            "name": self.name,
+            "status": "EXECUTED",
+            "changes": [change],
+        }
