@@ -155,11 +155,42 @@ class ClimateProcess(EnvironmentalProcess):
                 else "INVALID_CLIMATE"
             ),
             "climate": world.environment.climate,
-            "valid_climates": list(world.environment.CLIMATES),
+            "valid_climates": list(
+                world.environment.CLIMATES
+            ),
         }
 
     def execute(self, world):
         change = world.environment.update_climate()
+
+        return {
+            "process_id": self.process_id,
+            "name": self.name,
+            "status": "EXECUTED",
+            "changes": [change],
+        }
+
+
+class WaterCycleProcess(EnvironmentalProcess):
+    process_id = "EP-004"
+    name = "Water Cycle"
+
+    def evaluate(self, world):
+        return {
+            "admissible": True,
+            "reason": "ADMISSIBLE",
+            "climate": world.environment.climate,
+            "season": world.environment.season,
+            "weather": world.environment.weather,
+            "temperature": world.environment.temperature,
+            "rainfall": world.environment.rainfall,
+            "water_availability": (
+                world.environment.water_availability
+            ),
+        }
+
+    def execute(self, world):
+        change = world.environment.update_water_cycle()
 
         return {
             "process_id": self.process_id,
