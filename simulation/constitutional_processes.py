@@ -6,10 +6,7 @@ class ConstitutionalProcess:
     name = "Base Constitutional Process"
 
     def evaluate(self, world):
-        return {
-            "admissible": True,
-            "reason": "ADMISSIBLE",
-        }
+        return {"admissible": True, "reason": "ADMISSIBLE"}
 
     def execute(self, world):
         raise NotImplementedError
@@ -25,32 +22,23 @@ class FoodGrowthProcess(ConstitutionalProcess):
 
         if soil >= 90 and water == "Abundant":
             return 8
-
         if soil >= 75 and water == "Normal":
             return 5
-
         if soil >= 50 and water == "Normal":
             return 3
-
         if water == "Limited":
             return 1
-
         return 0
 
     def evaluate(self, world):
         admissible = (
-            world.environment.water_availability
-            in world.environment.WATER_STATES
+            world.environment.water_availability in world.environment.WATER_STATES
             and 0 <= world.environment.soil_fertility <= 100
         )
 
         return {
             "admissible": admissible,
-            "reason": (
-                "ADMISSIBLE"
-                if admissible
-                else "INVALID_ENVIRONMENTAL_STATE"
-            ),
+            "reason": "ADMISSIBLE" if admissible else "INVALID_ENVIRONMENTAL_STATE",
             "climate": world.environment.climate,
             "season": world.environment.season,
             "weather": world.environment.weather,
@@ -78,17 +66,10 @@ class FoodConsumptionProcess(ConstitutionalProcess):
     def evaluate(self, world):
         population = world.population.total
         available = world.resources.food
-
         required = max(population, 1)
 
-        ratio = min(
-            available / required,
-            1.0,
-        )
-
-        consumed = math.floor(
-            population * ratio
-        )
+        ratio = min(available / required, 1.0)
+        consumed = math.floor(population * ratio)
 
         return {
             "admissible": True,
@@ -103,16 +84,17 @@ class FoodConsumptionProcess(ConstitutionalProcess):
     def execute(self, world):
         governance = self.evaluate(world)
 
-        consumed = governance["food_consumed"]
+        world.population.last_consumption_ratio = governance["consumption_ratio"]
+        world.population.last_food_consumed = governance["food_consumed"]
 
-        change = world.resources.consume_food(
-            consumed
-        )
+        change = world.resources.consume_food(governance["food_consumed"])
 
         return {
             "process_id": self.process_id,
             "name": self.name,
             "status": "EXECUTED",
+            "consumption_ratio": governance["consumption_ratio"],
+            "food_consumed": governance["food_consumed"],
             "changes": [change],
         }
 
@@ -122,24 +104,40 @@ class PopulationHungerPressureProcess(ConstitutionalProcess):
     name = "Population Hunger Pressure"
 
     def evaluate(self, world):
+        ratio = getattr(world.population, "last_consumption_ratio", 1.0)
+
         return {
             "admissible": True,
             "reason": "ADMISSIBLE",
-            "food": world.resources.food,
             "population": world.population.total,
+            "food": world.resources.food,
+            "consumption_ratio": ratio,
             "current_hunger_pressure": world.population.hunger_pressure,
         }
 
     def execute(self, world):
-        if world.resources.food <= 0:
-            change = world.population.increase_hunger_pressure(1)
-        else:
+        ratio = getattr(world.population, "last_consumption_ratio", 1.0)
+
+        if ratio >= 1.0:
             change = world.population.reduce_hunger_pressure(1)
+        elif ratio >= 0.75:
+            change = {
+                "population_metric": "hunger_pressure",
+                "change": 0,
+                "new_value": world.population.hunger_pressure,
+            }
+        elif ratio >= 0.50:
+            change = world.population.increase_hunger_pressure(1)
+        elif ratio >= 0.25:
+            change = world.population.increase_hunger_pressure(2)
+        else:
+            change = world.population.increase_hunger_pressure(3)
 
         return {
             "process_id": self.process_id,
             "name": self.name,
             "status": "EXECUTED",
+            "consumption_ratio": ratio,
             "changes": [change],
         }
 
@@ -180,11 +178,7 @@ class PopulationGrowthProcess(ConstitutionalProcess):
 
         return {
             "admissible": admissible,
-            "reason": (
-                "ADMISSIBLE"
-                if admissible
-                else "GROWTH_DENIED"
-            ),
+            "reason": "ADMISSIBLE" if admissible else "GROWTH_DENIED",
             "health": world.population.health,
             "hunger_pressure": world.population.hunger_pressure,
             "food": world.resources.food,
@@ -214,11 +208,7 @@ class PopulationMortalityProcess(ConstitutionalProcess):
 
         return {
             "admissible": admissible,
-            "reason": (
-                "ADMISSIBLE"
-                if admissible
-                else "MORTALITY_DENIED"
-            ),
+            "reason": "ADMISSIBLE" if admissible else "MORTALITY_DENIED",
             "health": world.population.health,
             "hunger_pressure": world.population.hunger_pressure,
             "food": world.resources.food,
