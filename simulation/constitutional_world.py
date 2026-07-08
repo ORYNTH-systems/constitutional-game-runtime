@@ -14,6 +14,7 @@ from simulation.constitutional_processes import (
     PopulationMortalityProcess,
 )
 from simulation.environmental_processes import (
+    ClimateProcess,
     SeasonalTransitionProcess,
     WeatherProcess,
 )
@@ -28,23 +29,32 @@ class ConstitutionalWorld:
         self.history = []
 
         self.process_registry = ConstitutionalProcessRegistry()
+
+        # Biological System
         self.process_registry.register(FoodGrowthProcess())
         self.process_registry.register(FoodConsumptionProcess())
         self.process_registry.register(PopulationHungerPressureProcess())
         self.process_registry.register(PopulationHealthProcess())
         self.process_registry.register(PopulationGrowthProcess())
         self.process_registry.register(PopulationMortalityProcess())
+
+        # Environmental System
+        self.process_registry.register(ClimateProcess())
         self.process_registry.register(SeasonalTransitionProcess())
         self.process_registry.register(WeatherProcess())
 
-        self.process_engine = ConstitutionalProcessEngine(self.process_registry)
+        self.process_engine = ConstitutionalProcessEngine(
+            self.process_registry
+        )
 
         self.revision = self._create_revision(
             revision=0,
             evidence={
                 "event": "world_initialized",
                 "governance": "active",
-                "registered_processes": self.process_registry.identifiers(),
+                "registered_processes": (
+                    self.process_registry.identifiers()
+                ),
             },
         )
 
@@ -54,9 +64,10 @@ class ConstitutionalWorld:
             clock=self.clock,
             resources=self.resources,
             population=self.population,
-            evidence=evidence,
             environment=self.environment,
+            evidence=evidence,
         )
+
         self.history.append(world_revision)
         return world_revision
 
@@ -75,13 +86,16 @@ class ConstitutionalWorld:
                 "approved": len(process_results["executed"]),
                 "denied": len(process_results["denied"]),
             },
-            "registered_processes": self.process_registry.identifiers(),
+            "registered_processes": (
+                self.process_registry.identifiers()
+            ),
         }
 
         self.revision = self._create_revision(
             revision=self.revision.revision + 1,
             evidence=evidence,
         )
+
         return self.revision
 
     def describe_process_registry(self):

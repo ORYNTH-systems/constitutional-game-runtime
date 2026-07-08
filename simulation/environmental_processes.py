@@ -48,13 +48,6 @@ class SeasonalTransitionProcess(EnvironmentalProcess):
 
 
 class WeatherProcess(EnvironmentalProcess):
-    """
-    EP-002: Weather Reconstruction
-
-    Weather is reconstructed from the
-    current constitutional season.
-    """
-
     process_id = "EP-002"
     name = "Weather Reconstruction"
 
@@ -90,6 +83,7 @@ class WeatherProcess(EnvironmentalProcess):
             "admissible": True,
             "reason": "ADMISSIBLE",
             "season": world.environment.season,
+            "climate": world.environment.climate,
             "current_weather": world.environment.weather,
         }
 
@@ -110,7 +104,11 @@ class WeatherProcess(EnvironmentalProcess):
         world.environment.evidence = {
             "event": "weather_updated",
             "season": world.environment.season,
+            "climate": world.environment.climate,
             "weather": world.environment.weather,
+            "environment_revision": (
+                world.environment.environment_revision
+            ),
         }
 
         return {
@@ -136,4 +134,36 @@ class WeatherProcess(EnvironmentalProcess):
                     "new_value": world.environment.wind,
                 },
             ],
+        }
+
+
+class ClimateProcess(EnvironmentalProcess):
+    process_id = "EP-003"
+    name = "Climate Verification"
+
+    def evaluate(self, world):
+        admissible = (
+            world.environment.climate
+            in world.environment.CLIMATES
+        )
+
+        return {
+            "admissible": admissible,
+            "reason": (
+                "CLIMATE_STABLE"
+                if admissible
+                else "INVALID_CLIMATE"
+            ),
+            "climate": world.environment.climate,
+            "valid_climates": list(world.environment.CLIMATES),
+        }
+
+    def execute(self, world):
+        change = world.environment.update_climate()
+
+        return {
+            "process_id": self.process_id,
+            "name": self.name,
+            "status": "EXECUTED",
+            "changes": [change],
         }
