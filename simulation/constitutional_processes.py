@@ -16,12 +16,57 @@ class FoodGrowthProcess(ConstitutionalProcess):
     process_id = "CP-001"
     name = "Food Growth"
 
+    def growth_amount(self, world):
+        soil = world.environment.soil_fertility
+        water = world.environment.water_availability
+
+        if soil >= 90 and water == "Abundant":
+            return 8
+
+        if soil >= 75 and water == "Normal":
+            return 5
+
+        if soil >= 50 and water == "Normal":
+            return 3
+
+        if water == "Limited":
+            return 1
+
+        if water == "Scarce":
+            return 0
+
+        return 0
+
+    def evaluate(self, world):
+        admissible = (
+            world.environment.water_availability
+            in world.environment.WATER_STATES
+            and 0 <= world.environment.soil_fertility <= 100
+        )
+
+        return {
+            "admissible": admissible,
+            "reason": (
+                "ADMISSIBLE"
+                if admissible
+                else "INVALID_ENVIRONMENTAL_STATE"
+            ),
+            "climate": world.environment.climate,
+            "season": world.environment.season,
+            "weather": world.environment.weather,
+            "water_availability": world.environment.water_availability,
+            "soil_fertility": world.environment.soil_fertility,
+        }
+
     def execute(self, world):
-        change = world.resources.grow_food(4)
+        amount = self.growth_amount(world)
+        change = world.resources.grow_food(amount)
+
         return {
             "process_id": self.process_id,
             "name": self.name,
             "status": "EXECUTED",
+            "growth_amount": amount,
             "changes": [change],
         }
 
