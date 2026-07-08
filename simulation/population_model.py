@@ -7,6 +7,8 @@ class PopulationModel:
         self.total = 100
         self.health = 100
         self.hunger_pressure = 0
+        self.last_consumption_ratio = 1.0
+        self.last_food_consumed = 0
 
     def increase_hunger_pressure(self, amount):
         self.hunger_pressure += amount
@@ -36,6 +38,8 @@ class PopulationModel:
             "population_metric": "health",
             "previous": previous,
             "new_value": self.health,
+            "hunger_pressure": self.hunger_pressure,
+            "consumption_ratio": self.last_consumption_ratio,
         }
 
     def grow(self, amount):
